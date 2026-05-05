@@ -1,63 +1,166 @@
 # SOC Analyst Toolkit
 
-Collection de scripts défensifs pour l’analyse SOC, le triage phishing, l’extraction d’artefacts, les logs et l’investigation numérique.
+Collection de scripts défensifs pour l’analyse SOC, le triage phishing, l’extraction d’artefacts, la gestion d’IOC, l’analyse de logs, l’analyse réseau, l’investigation Windows et les premiers réflexes Blue Team.
 
-## Objectif
+Ce dépôt a pour objectif de regrouper des outils simples, lisibles et utiles dans un contexte d’apprentissage SOC Analyst, de lab cybersécurité, de réponse à incident légère et d’analyse défensive.
 
-Ce dépôt regroupe des outils simples, documentés et utilisables dans un contexte défensif : SOC, Blue Team, DFIR, phishing analysis, labs et entraînement personnel.
+## Objectifs du dépôt
+
+- Centraliser des scripts pratiques pour l’analyse SOC.
+- Automatiser certaines tâches répétitives de triage.
+- Faciliter l’extraction d’IOC depuis des emails, logs, fichiers ou PCAP.
+- Fournir une base de documentation claire pour progresser en Blue Team.
+- Construire progressivement un toolkit personnel utilisable en lab et en environnement autorisé.
 
 ## Arborescence
 
 ```text
 soc-analyst-toolkit/
-├── phishing/   # Analyse d'emails, extraction d'URLs, pièces jointes, défang
-├── hashing/    # Hash de fichiers et dossiers
-├── logs/       # Extraction d'IOC depuis des logs texte
-├── network/    # Extraction IP/domaines et filtres Wireshark
-├── windows/    # Scripts PowerShell Blue Team Windows
-├── yara/       # Helpers et règles YARA défensives
-├── docs/       # Workflows et modèles SOC
-└── tests/      # Tests unitaires simples
+├── docs/
+├── hashing/
+├── iocs/
+├── logs/
+├── network/
+├── phishing/
+├── samples/
+├── tests/
+├── windows/
+└── yara/
 ```
 
-## Installation rapide
+## Modules principaux
+
+### `phishing/`
+
+Scripts dédiés à l’analyse d’emails suspects :
+
+- extraction de pièces jointes `.eml`
+- extraction d’URLs
+- extraction d’IOC
+- analyse de headers
+- vérification SPF/DKIM/DMARC
+- defang/refang d’IOC
+
+### `iocs/`
+
+Outils pour nettoyer, dédupliquer, classer et documenter des indicateurs de compromission.
+
+### `hashing/`
+
+Scripts pour calculer les hashes de fichiers ou de dossiers complets.
+
+### `logs/`
+
+Scripts d’analyse de logs et de détection de motifs suspects.
+
+### `network/`
+
+Outils et notes pour l’analyse réseau, notamment SMTP, DNS et PCAP.
+
+### `windows/`
+
+Scripts PowerShell orientés Blue Team Windows : Defender, Sysmon, processus suspects, export d’événements.
+
+### `yara/`
+
+Aides à la génération et à l’exécution de règles YARA.
+
+### `docs/`
+
+Guides, checklists, workflows et modèles de rapport.
+
+## Prérequis
+
+Les scripts Python sont conçus pour Python 3.10+.
+
+Installation recommandée :
 
 ```bash
-git clone https://github.com/PotiteBulle/soc-analyst-toolkit.git
-cd soc-analyst-toolkit
-python3 -m pip install -r requirements.txt 2>/dev/null || true
+python3 --version
 ```
 
-La majorité des scripts Python n’utilisent que la bibliothèque standard.
+Certains scripts réseau peuvent nécessiter `tshark` :
 
-## Exemples
+```bash
+tshark --version
+```
 
-Extraire les pièces jointes d’un email `.eml` :
+Les scripts PowerShell doivent être lancés sur Windows avec les droits adaptés selon les actions effectuées.
+
+## Utilisation rapide
+
+Exemple : extraire des pièces jointes depuis un email `.eml`.
 
 ```bash
 python3 phishing/extract_eml_attachments.py suspicious.eml -o extracted_attachments
 ```
 
-Extraire les URLs d’un email :
+Exemple : extraire des IOC depuis un email.
 
 ```bash
-python3 phishing/extract_urls_from_eml.py suspicious.eml
+python3 phishing/extract_email_iocs.py suspicious.eml --json rapport_iocs.json
 ```
 
-Hasher un fichier :
+Exemple : calculer le SHA256 d’un fichier.
 
 ```bash
 python3 hashing/hash_file.py sample.bin
 ```
 
-Extraire des IOC depuis un log :
+Exemple : analyser un PCAP SMTP avec `tshark`.
 
 ```bash
-python3 logs/extract_iocs_from_logs.py suspicious.log -o iocs.json
+python3 network/smtp_pcap_helper.py traffic.pcap
 ```
+
+## Bonnes pratiques
+
+- Ne jamais exécuter une pièce jointe suspecte sur une machine de production.
+- Travailler dans une VM ou un lab isolé.
+- Ne pas publier de vrais emails, PCAP, logs internes ou données sensibles.
+- Defanger les IOC avant de les partager publiquement.
+- Vérifier les scripts avant toute utilisation dans un environnement réel.
+
+## Données sensibles et samples
+
+Le dépôt contient un dossier `samples/`, mais celui-ci ne doit pas contenir de malware réel, d’emails sensibles, de PCAP privés ou de données personnelles.
+
+Les fichiers suivants sont ignorés volontairement par `.gitignore` :
+
+```text
+*.eml
+*.pcap
+*.pcapng
+extracted_attachments/
+output/
+samples/*
+```
+
+## Roadmap
+
+Idées d’amélioration futures :
+
+- Ajouter un générateur de rapport phishing complet.
+- Ajouter un export JSON/CSV standardisé pour tous les scripts.
+- Ajouter des tests unitaires supplémentaires.
+- Ajouter des exemples factices dans `samples/`.
+- Ajouter des workflows SOC orientés TryHackMe / Hack The Box.
+- Ajouter des règles Sigma et YARA défensives.
+- Ajouter un mode interactif pour certains scripts.
 
 ## Usage éthique
 
-Ce dépôt est destiné uniquement à l’analyse défensive, à la formation, aux laboratoires autorisés et à la réponse à incident.
+Ce dépôt est destiné uniquement à :
 
-Ne pas exécuter de fichiers suspects sur un système de production. Les scripts sont conçus pour l’analyse statique, le triage défensif et l’investigation numérique.
+- l’analyse défensive
+- la formation SOC / Blue Team
+- les laboratoires autorisés
+- l’investigation numérique
+- la réponse à incident
+- la recherche personnelle dans un cadre légal.
+
+Il ne doit pas être utilisé pour mener des actions offensives non autorisées, contourner des protections, exécuter des charges malveillantes ou nuire à des systèmes tiers.
+
+## Licence
+
+Ce projet est publié sous licence MIT.
